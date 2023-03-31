@@ -4,7 +4,8 @@ from sklearn.svm import SVR
 
 parser = argparse.ArgumentParser(description='prints the arg to cli')
 
-parser.add_argument('-message', metavar='message', type=str, help='enter your message')
+parser.add_argument('-location', metavar='location', type=str, help='location of your dataset')
+parser.add_argument('-message', metavar='message', type=str,help='enter your message')
 parser.add_argument('--kernel', metavar='kernel', type=str, help='the kernel you wish to train the SVM with', default='linear')
 parser.add_argument('--degree', metavar='degree', type=int, help='Degree of the polynomial kernel function, must be non-negative', default=3)
 parser.add_argument('--gamma', metavar='gamma', type=str, help='Kernel coefficient for rbf, poly and sigmoid', default='scale')
@@ -21,7 +22,7 @@ args = parser.parse_args()
 message = args.message
 
 
-df = pd.read_csv('winequality.csv')
+df = pd.read_csv(args.location)
 X = df.drop(columns='quality')
 y = df['quality']
 
