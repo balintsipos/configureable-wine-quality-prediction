@@ -1,11 +1,16 @@
-import pandas as pd
+import os
 import argparse
+import pandas as pd
 from sklearn.svm import SVR
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import r2_score, mean_squared_error
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 parser = argparse.ArgumentParser(description='Train an SVR and get results')
 
-parser.add_argument('-l', '--location', metavar='', type=str, help='Location of your dataset', required=True)
+parser.add_argument('-l', '--location', metavar='', type=str, help='Location of your dataset', default = './data/winequality.csv')
+parser.add_argument('-tf', '--target_folder', metavar='', type=str, help='Target folder for results', default='./results')
 parser.add_argument('-ts', '--test_split', metavar='', type=float, help='Size of the test set compared to the entire dataset', default=0.3)
 parser.add_argument('-k', '--kernel', metavar='', type=str, help='The kernel you wish to train the SVM with', default='linear')
 parser.add_argument('-d', '--degree', metavar='', type=int, help='Degree of the polynomial kernel function, must be non-negative', default=3)
@@ -27,7 +32,7 @@ y = df['quality']
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=args.test_split)
 
-# making sure both float and 'scale'/'auto' types are supported
+# Making sure both float and 'scale'/'auto' types are supported
 gamma = args.gamma
 if isinstance(gamma, int) or isinstance(gamma, float):
     gamma = float(gamma)
@@ -46,8 +51,38 @@ model = SVR(
     max_iter=args.max_iter
     )
 
+if not os.path.exists(args.target_folder):
+    os.makedirs(args.target_folder)
 
 model.fit(X_train, y_train)
-predictions = model.predict(X_test)
-print(predictions)
-print(y_test)
+y_pred = model.predict(X_test)
+
+r2 = r2_score(y_test, y_pred)
+mse = mean_squared_error(y_test, y_pred)
+
+# Residual plot to visualize the magnitude of difference between predicted and actual
+sns.residplot(x=y_pred, y=y_test)
+sns.set_theme()
+plt.xlabel('Predicted values')
+plt.ylabel('Residuals')
+plt.title('Residual plot (R2: {:.2f}, MSE: {:.2f})'.format(r2, mse))
+plt.savefig(os.path.join(args.target_folder, 'residualplot.png'))
+plt.clf()
+
+# Regression plot, the closer to the line, the better
+df = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred})
+sns.regplot(x='Actual', y='Predicted', data=df)
+sns.set_theme()
+plt.title('Regression plot for Actual vs Predicted values')
+plt.savefig(os.path.join(args.target_folder, 'regplot.png'))
+plt.clf()
+
+# Histogram to see how each bin compares to the nr of actual values
+plt.hist([y_test, y_pred], color= ['r', 'b'], bins=5)
+plt.legend (['Actual', 'Predicted'], loc = 'upper right')
+plt.title('Histogram of predicted wine quality')
+plt.xlabel('Wine quality')
+plt.ylabel('Frequency')
+plt.savefig(os.path.join(args.target_folder, 'histplot.png'))
+
+# No confusion matrix as this is a regression model
