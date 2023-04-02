@@ -12,6 +12,7 @@ parser = argparse.ArgumentParser(description='Train an SVR and get results')
 parser.add_argument('-l', '--location', metavar='', type=str, help='Location of your dataset', default = './data/winequality.csv')
 parser.add_argument('-tf', '--target_folder', metavar='', type=str, help='Target folder for results', default='./results')
 parser.add_argument('-ts', '--test_split', metavar='', type=float, help='Size of the test set compared to the entire dataset', default=0.3)
+parser.add_argument('-f', '--features', metavar='', type=str, nargs='+', help='Features to include during training', default=None)
 parser.add_argument('-k', '--kernel', metavar='', type=str, help='The kernel you wish to train the SVM with', default='linear')
 parser.add_argument('-d', '--degree', metavar='', type=int, help='Degree of the polynomial kernel function, must be non-negative', default=3)
 parser.add_argument('-g', '--gamma', metavar='', type=str, help='Kernel coefficient for rbf, poly and sigmoid', default='scale')
@@ -27,7 +28,11 @@ parser.add_argument('-mi', '--max_iter', metavar='', type=int, help='Hard limit 
 args = parser.parse_args()
 
 df = pd.read_csv(args.location)
-X = df.drop(columns='quality')
+
+if args.features != None:
+    X = df[args.features]
+else:
+    X = df.drop(columns='quality')
 y = df['quality']
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=args.test_split)
@@ -51,11 +56,11 @@ model = SVR(
     max_iter=args.max_iter
     )
 
-if not os.path.exists(args.target_folder):
-    os.makedirs(args.target_folder)
-
 model.fit(X_train, y_train)
 y_pred = model.predict(X_test)
+
+if not os.path.exists(args.target_folder):
+    os.makedirs(args.target_folder)
 
 r2 = r2_score(y_test, y_pred)
 mse = mean_squared_error(y_test, y_pred)
@@ -73,16 +78,14 @@ plt.clf()
 df = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred})
 sns.regplot(x='Actual', y='Predicted', data=df)
 sns.set_theme()
-plt.title('Regression plot for Actual vs Predicted values')
+plt.title('Regression plot for Actual vs Predicted values (R2: {:.2f}, MSE: {:.2f})'.format(r2, mse))
 plt.savefig(os.path.join(args.target_folder, 'regplot.png'))
 plt.clf()
 
 # Histogram to see how each bin compares to the nr of actual values
 plt.hist([y_test, y_pred], color= ['r', 'b'], bins=5)
 plt.legend (['Actual', 'Predicted'], loc = 'upper right')
-plt.title('Histogram of predicted wine quality')
+plt.title('Histogram of predicted wine quality (R2: {:.2f}, MSE: {:.2f})'.format(r2, mse))
 plt.xlabel('Wine quality')
 plt.ylabel('Frequency')
 plt.savefig(os.path.join(args.target_folder, 'histplot.png'))
-
-# No confusion matrix as this is a regression model
