@@ -5,24 +5,21 @@ from sklearn.model_selection import train_test_split
 
 parser = argparse.ArgumentParser(description='Train an SVR and get results')
 
-parser.add_argument('-location', metavar='location', type=str, help='Location of your dataset')
-parser.add_argument('-message', metavar='message', type=str,help='Enter your message')
-parser.add_argument('--test_split', metavar='test_split', type=float, help='Size of the test set compared to the entire dataset', default=0.3)
-parser.add_argument('--kernel', metavar='kernel', type=str, help='The kernel you wish to train the SVM with', default='linear')
-parser.add_argument('--degree', metavar='degree', type=int, help='Degree of the polynomial kernel function, must be non-negative', default=3)
-parser.add_argument('--gamma', metavar='gamma', type=str, help='Kernel coefficient for rbf, poly and sigmoid', default='scale')
-parser.add_argument('--coef0', metavar='coef0', type=float, help='Independent term in kernel function. It is only significant in poly and sigmoid', default=0.0)
-parser.add_argument('--tol', metavar='tol', type=float, help='Tolerance for stopping criterion', default=1e-3)
-parser.add_argument('--C', metavar='C', type=float, help='Regularization parameter. The strength of the regularization is inversely proportional to C', default=1.0)
-parser.add_argument('--epsilon', metavar='epsilon', type=float, help='Epsilon in the epsilon-SVR model', default=0.1)
-parser.add_argument('--shrinking', metavar='shrinking', type=bool, help='Whether to use the shrinking heuristic', default=True)
-parser.add_argument('--cache_size', metavar='cache-size', type=float, help='Specify the size of the kernel cache in MB', default=200)
-parser.add_argument('--verbose', metavar='verbose', type=bool, help='Enable verbose output',default=False)
-parser.add_argument('--max_iter', metavar='max_iter', type=int, help='Hard limit on iterations within solver, or -1 for no limit', default=-1)
+parser.add_argument('-l', '--location', metavar='', type=str, help='Location of your dataset', required=True)
+parser.add_argument('-ts', '--test_split', metavar='', type=float, help='Size of the test set compared to the entire dataset', default=0.3)
+parser.add_argument('-k', '--kernel', metavar='', type=str, help='The kernel you wish to train the SVM with', default='linear')
+parser.add_argument('-d', '--degree', metavar='', type=int, help='Degree of the polynomial kernel function, must be non-negative', default=3)
+parser.add_argument('-g', '--gamma', metavar='', type=str, help='Kernel coefficient for rbf, poly and sigmoid', default='scale')
+parser.add_argument('-c0' ,'--coef0', metavar='', type=float, help='Independent term in kernel function. It is only significant in poly and sigmoid', default=0.0)
+parser.add_argument('-t', '--tol', metavar='', type=float, help='Tolerance for stopping criterion', default=1e-3)
+parser.add_argument('-C', '--C', metavar='', type=float, help='Regularization parameter. The strength of the regularization is inversely proportional to C', default=1.0)
+parser.add_argument('-e', '--epsilon', metavar='', type=float, help='Epsilon in the epsilon-SVR model', default=0.1)
+parser.add_argument('-s', '--shrinking', metavar='', type=bool, help='Whether to use the shrinking heuristic', default=True)
+parser.add_argument('-cs', '--cache_size', metavar='', type=float, help='Specify the size of the kernel cache in MB', default=200)
+parser.add_argument('-v' , '--verbose', metavar='', type=bool, help='Enable verbose output',default=False)
+parser.add_argument('-mi', '--max_iter', metavar='', type=int, help='Hard limit on iterations within solver, or -1 for no limit', default=-1)
 
 args = parser.parse_args()
-message = args.message
-
 
 df = pd.read_csv(args.location)
 X = df.drop(columns='quality')
@@ -50,6 +47,7 @@ model = SVR(
     )
 
 
-model.fit(X, y)
-predictions = model.predict(X)
+model.fit(X_train, y_train)
+predictions = model.predict(X_test)
 print(predictions)
+print(y_test)
