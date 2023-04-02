@@ -9,7 +9,7 @@ import seaborn as sns
 
 parser = argparse.ArgumentParser(description='Train an SVR and get results')
 
-parser.add_argument('-l', '--location', metavar='', type=str, help='Location of your dataset', default = './data/winequality.csv')
+parser.add_argument('-l', '--location', metavar='', type=str, help='Location of your dataset', default = 'winequality.csv')
 parser.add_argument('-tf', '--target_folder', metavar='', type=str, help='Target folder for results', default='./results')
 parser.add_argument('-ts', '--test_split', metavar='', type=float, help='Size of the test set compared to the entire dataset', default=0.3)
 parser.add_argument('-f', '--features', metavar='', type=str, nargs='+', help='Features to include during training', default=None)
