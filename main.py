@@ -1,12 +1,14 @@
 import pandas as pd
 import argparse
 from sklearn.svm import SVR
+from sklearn.model_selection import train_test_split
 
-parser = argparse.ArgumentParser(description='prints the arg to cli')
+parser = argparse.ArgumentParser(description='Train an SVR and get results')
 
-parser.add_argument('-location', metavar='location', type=str, help='location of your dataset')
-parser.add_argument('-message', metavar='message', type=str,help='enter your message')
-parser.add_argument('--kernel', metavar='kernel', type=str, help='the kernel you wish to train the SVM with', default='linear')
+parser.add_argument('-location', metavar='location', type=str, help='Location of your dataset')
+parser.add_argument('-message', metavar='message', type=str,help='Enter your message')
+parser.add_argument('--test_split', metavar='test_split', type=float, help='Size of the test set compared to the entire dataset', default=0.3)
+parser.add_argument('--kernel', metavar='kernel', type=str, help='The kernel you wish to train the SVM with', default='linear')
 parser.add_argument('--degree', metavar='degree', type=int, help='Degree of the polynomial kernel function, must be non-negative', default=3)
 parser.add_argument('--gamma', metavar='gamma', type=str, help='Kernel coefficient for rbf, poly and sigmoid', default='scale')
 parser.add_argument('--coef0', metavar='coef0', type=float, help='Independent term in kernel function. It is only significant in poly and sigmoid', default=0.0)
@@ -26,7 +28,9 @@ df = pd.read_csv(args.location)
 X = df.drop(columns='quality')
 y = df['quality']
 
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=args.test_split)
 
+# making sure both float and 'scale'/'auto' types are supported
 gamma = args.gamma
 if isinstance(gamma, int) or isinstance(gamma, float):
     gamma = float(gamma)
@@ -49,4 +53,3 @@ model = SVR(
 model.fit(X, y)
 predictions = model.predict(X)
 print(predictions)
-print(type(message))
