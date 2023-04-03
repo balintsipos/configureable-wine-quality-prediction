@@ -1,6 +1,6 @@
 # regens-take-home
 
-A feladat során megvalósításra került minden követelmény, valamint a Docker konténeriáció is.
+A feladat során megvalósításra került minden követelmény, valamint a Docker konténerizáció is.
 
 ## Döntések
 
