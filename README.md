@@ -1,7 +1,3 @@
-# regens-take-home
-
-A feladat során megvalósításra került minden követelmény, valamint a Docker konténerizáció is.
-
 ## Döntések
 
 A megoldás során nem használtam virtual environmentet, mivel a megoldás Docker konténerizált, így a dependency-elkülönítést ez önmagában megoldja, és felesleges overheadet rakna erre a use-casere, de kétségkívül megvalósítható, ha átmásoljuk az image-be a venv mappát és, entrypointnak a venv-et használjuk.
